@@ -1,19 +1,23 @@
 import atexit
 import logging
 from os.path import dirname, realpath
+import pprint
 
 from evernotebot import EvernoteBot
 from evernotebot.config import load_config
-from evernotebot.views import telegram_hook, evernote_oauth
 from evernotebot.util.wsgi import WsgiApplication
+from evernotebot.views import evernote_oauth, telegram_hook
 
 
 class EvernoteBotApplication(WsgiApplication):
     def __init__(self):
         config = load_config()
+        print('config')
+        pprint.pprint(config)
         webhook_url = 'https://{host}/{token}'.format(
             host=config['host'], token=config['telegram']['token']
         )
+        print('webhook_url', webhook_url)
         self.config = config
         super().__init__(
             src_root=realpath(dirname(__file__)),
