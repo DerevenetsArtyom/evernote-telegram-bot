@@ -3,7 +3,6 @@
 *.log
 *.pyc
 *.sqlite
-.DS_Store
 
 # dirs
 __pycache__
@@ -11,6 +10,5 @@ __pycache__
 .idea
 .vscode
 htmlcov
-venv
 env
 logs
