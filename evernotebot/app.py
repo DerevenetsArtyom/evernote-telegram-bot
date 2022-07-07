@@ -12,12 +12,12 @@ from evernotebot.views import evernote_oauth, telegram_hook
 class EvernoteBotApplication(WsgiApplication):
     def __init__(self):
         config = load_config()
-        print('config')
+        print('EvernoteBotApplication config')
         pprint.pprint(config)
         webhook_url = 'https://{host}/{token}'.format(
             host=config['host'], token=config['telegram']['token']
         )
-        print('webhook_url', webhook_url)
+        print('EvernoteBotApplication webhook_url', webhook_url)
         self.config = config
         super().__init__(
             src_root=realpath(dirname(__file__)),
