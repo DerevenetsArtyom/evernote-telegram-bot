@@ -1,12 +1,13 @@
-from wsgiref.simple_server import make_server
-
+import os
 from dotenv import load_dotenv
+from wsgiref.simple_server import make_server
 
 from evernotebot.app import EvernoteBotApplication
 
 load_dotenv()  # take environment variables from .env.
 
-host, port = '0.0.0.0', 8080
+host = '0.0.0.0'
+port = int(os.getenv("PORT", "5000"))
 app = EvernoteBotApplication()
 
 try:
