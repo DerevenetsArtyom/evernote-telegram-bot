@@ -1,8 +1,5 @@
 Telegram bot for Evernote
 =========================
-[![Build status](https://travis-ci.org/djudman/evernote-telegram-bot.svg?branch=master)](https://travis-ci.org/djudman/evernote-telegram-bot?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/djudman/evernote-telegram-bot/badge.svg?branch=master)](https://coveralls.io/github/djudman/evernote-telegram-bot?branch=master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/1d23d48c1a7370b7b12f/maintainability)](https://codeclimate.com/github/djudman/evernote-telegram-bot/maintainability)
 
 This bot can save everything that you send to your Evernote account.
 
@@ -78,3 +75,63 @@ your own installation.
 | EVERNOTE_FULL_ACCESS_KEY     | -             | appKey for your Evernote app (with read/write permissions) |
 | EVERNOTE_FULL_ACCESS_SECRET  | -             | secret for your Evernote app (with read/write permissions) |
 | MONGO_HOST                   | 127.0.0.1     | Hostname for mongodb host|
+
+# 🚢 Deploy with Dokku (DO-based)
+
+Assuming you have set up everything on Digital Ocean:
+
+### On Dokku machine:
+1. Create an application (in Dokku terms).  
+   Make sure you've picked up an appropriate name to have it as a subdomain.
+```
+dokku apps:create tg-evernote
+```
+
+2. Make sure Dokku knows about your main domain and add subdomain for the app.
+```
+dokku domains:set-global [your.main.domain]
+dokku domains:set tg-evernote tg-evernote.[your.main.domain]
+```
+
+3. Set up config variables to be able to run the bot.  
+   In case you're migrating from Heroku - run `heroku config` and adjust an output.
+
+```
+dokku config:set tg-evernote EVERNOTEBOT_DEBUG=0
+dokku config:set tg-evernote EVERNOTEBOT_HOSTNAME=""
+dokku config:set tg-evernote EVERNOTE_OAUTH_CALLBACK=""
+dokku config:set tg-evernote TELEGRAM_API_TOKEN=""
+dokku config:set tg-evernote TELEGRAM_BOT_NAME=""
+dokku config:set tg-evernote EVERNOTE_BASIC_ACCESS_KEY=""
+dokku config:set tg-evernote EVERNOTE_BASIC_ACCESS_SECRET=""
+dokku config:set tg-evernote EVERNOTE_FULL_ACCESS_KEY=""
+dokku config:set tg-evernote EVERNOTE_FULL_ACCESS_SECRET=""
+```
+
+4. Setup LetsEncrypt certs and Postgres database - install Postgres plugin and link DB with the app.
+```
+# Enable LetsEncrypt for the application
+dokku letsencrypt:enable tg-evernote
+
+# Check that everything is correct
+dokku letsencrypt:list
+dokku certs:report tg-evernote
+
+# DB Setup
+sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git
+
+dokku postgres:create evernotebot
+dokku postgres:link evernotebot tg-evernote
+```
+
+### On your local machine
+
+The only thing you need to do - add another remote to be able to push the code there.
+
+```
+git remote add dokku dokku@[your.server.ip.address]:[app_name]
+```
+Then you should be able to deploy your app just by typing
+```
+git push dokku master:master
+```
