@@ -1,3 +1,4 @@
+# TODO: the file is deprecated and used only as a reference to how it should be for all other storages
 from contextlib import suppress
 from copy import deepcopy
 import json
