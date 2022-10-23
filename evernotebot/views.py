@@ -1,24 +1,45 @@
-from evernotebot.util.http import HTTPFound, Request
+import asyncio
+import traceback
 
-from evernotebot.bot.shortcuts import evernote_oauth_callback, OauthParams
+from evernotebot.bot import EvernoteBot
+from evernotebot.bot.api import BotApiError
+from evernotebot.bot.errors import EvernoteBotException
+from evernotebot.util.asgi import Request
 
 
-def telegram_hook(request: Request):
-    data = request.json()
-    bot = request.app.bot
+async def set_webhook(request: Request):
+    bot: EvernoteBot = request.app.bot
+    config = request.app.config
+    webhook_url = config['webhook_url']
     try:
-        bot.process_update(data)
+        asyncio.run(bot.api.setWebhook(webhook_url))
     except Exception:
-        bot.fail_update(data)
-    return ''
+        message = f"Can't set up webhook url `{webhook_url}`"
+        bot.logger.fatal(message, exc_info=True)
 
 
-def evernote_oauth(request: Request):
+async def telegram_hook(request: Request):
+    data = await request.json()
+    if data:
+        bot: EvernoteBot = request.app.bot
+        try:
+            await bot.process_update(data)
+        except BotApiError as e:
+            bot.logger.error(f'{traceback.format_exc()} {e}')
+        return 'ok'
+    return 'request body is empty'
+
+
+async def evernote_oauth(request: Request):
     bot = request.app.bot
     params = request.GET
     callback_key = params['key']
     access_type = params['access']
+    if access_type not in {'readonly', 'readwrite'}:
+        raise Exception(f'Invalid access type {access_type}')
     verifier = params.get('oauth_verifier')
-    oauth_params = OauthParams(callback_key, verifier, access_type)
-    evernote_oauth_callback(bot, oauth_params)
-    return HTTPFound(bot.url)
+    try:
+        await bot.evernote_auth(callback_key, access_type, verifier)
+    except EvernoteBotException as e:
+        await bot.send_message(e.message)
+    return request.make_response(status=302, body=bot.url.encode())
