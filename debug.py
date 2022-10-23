@@ -3,9 +3,6 @@ import os
 import uvicorn
 
 
-# This file uses for debug only
-
-
 def set_var(name, value):
     os.environ[name] = value
 
@@ -20,8 +17,7 @@ if __name__ == '__main__':
         ('EVERNOTE_READWRITE_SECRET', 'debug'),
     ))
 
-    host = '127.0.0.1'
-    port = 8000
+    host, port = '127.0.0.1', 8000
     try:
         print(f'Starting `evernotebot` at http://{host}:{port}...')
         config = uvicorn.Config('evernotebot.wsgi:app', host=host, port=port, log_level='debug')
