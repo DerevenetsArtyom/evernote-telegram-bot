@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  postgres:
+    restart: unless-stopped
+    image: postgres:14.5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=iotile
+    volumes:
+      - evernote-bot-postgres:/var/lib/postgres/evernote-bot
+
+  evernote-bot:
+    restart: always
+    image: derevenets/evernote-telegram-bot:latest
+    volumes:
+      - ./logs:/app/logs:rw
+      - ./data:/app/db:rw
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    environment:
+      - EVERNOTEBOT_DEBUG=${EVERNOTEBOT_DEBUG:-True}
+      - EVERNOTEBOT_HOSTNAME=${EVERNOTEBOT_HOSTNAME:-localhost}
+      - TELEGRAM_BOT_NAME=${TELEGRAM_BOT_NAME:-test}
+      - TELEGRAM_API_TOKEN=${TELEGRAM_API_TOKEN:-secret}
+      - EVERNOTE_READONLY_KEY=${EVERNOTE_READONLY_KEY:-secret}
+      - EVERNOTE_READONLY_SECRET=${EVERNOTE_READONLY_SECRET:-secret}
+      - EVERNOTE_READWRITE_KEY=${EVERNOTE_READWRITE_KEY:-secret}
+      - EVERNOTE_READWRITE_SECRET=${EVERNOTE_READWRITE_SECRET:-secret}
+
+volumes:
+  evernote-bot-postgres:
