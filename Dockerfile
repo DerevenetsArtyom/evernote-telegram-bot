@@ -4,11 +4,10 @@ FROM python:3.10.1-alpine
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG C.UTF-8
 
-RUN apk update \
-	&& apk add --update --no-cache git tzdata gcc build-base
+RUN apk update && apk add --update --no-cache tzdata gcc build-base libpq-dev python3-dev
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 22.2.2
+ENV PYTHON_PIP_VERSION 22.3
 RUN set -ex; \
 	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
 	python get-pip.py --disable-pip-version-check --no-cache-dir "pip==$PYTHON_PIP_VERSION"; \
@@ -24,16 +23,14 @@ RUN set -ex; \
 
 WORKDIR /app/
 COPY requirements.txt requirements.txt
-RUN set -ex; \
-	pip3 install --no-cache-dir -r requirements.txt; \
-	cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime; \
-	mkdir /app/logs
+RUN pip3 install --no-cache-dir -r requirements.txt
+RUN mkdir /app/logs
 COPY evernotebot /app/evernotebot
 
 ENTRYPOINT [ \
 	"uvicorn", \
 	"--host=0.0.0.0", \
-	"--port=8000", \
+	"--port=8080", \
 	"--workers=2", \
 	"--loop=uvloop", \
 	"--ws=none", \
