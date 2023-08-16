@@ -45,7 +45,7 @@ your own installation.
     ```
     docker run \
         -e EVERNOTEBOT_DEBUG="$EVERNOTEBOT_DEBUG" \
-        -e EVERNOTEBOT_PORT="$EVERNOTEBOT_PORT" \
+        -e EVERNOTEBOT_EXPOSE_PORT="$EVERNOTEBOT_EXPOSE_PORT" \
         -e EVERNOTEBOT_HOSTNAME="$EVERNOTEBOT_HOSTNAME" \
         -e TELEGRAM_API_TOKEN="$TELEGRAM_API_TOKEN" \
         -e TELEGRAM_BOT_NAME="$TELEGRAM_BOT_NAME" \
@@ -69,7 +69,7 @@ your own installation.
 | EVERNOTEBOT_DIR           | $HOME/evernotebot     | Install dir for tha bot. Some files there. For example, `logs/` dir and `.env` file                          |
 | EVERNOTEBOT_DEBUG         | 0                     | Enable debug mode (additional logging, use evernote sandbox)                                                 |
 | EVERNOTEBOT_HOSTNAME      | evernotebot.djud.site | DNS name of your host. This name will use in such URLs as oauth callback url and webhook url                 |
-| EVERNOTEBOT_PORT          | 8000                  | Port that the docker container with bot listen on your machine. The bot inside container uses 127.0.0.1:8000 |
+| EVERNOTEBOT_EXPOSE_PORT   | 8000                  | Port that the docker container with bot listen on your machine. The bot inside container uses 127.0.0.1:8000 |
 | TELEGRAM_BOT_NAME         | evernoterobot         | Name of telegram bot. You used this in BotFather                                                             |
 | TELEGRAM_API_TOKEN        | -                     | Access token for telegram API. You can obtain this by BotFather                                              |
 | EVERNOTE_READONLY_KEY     | -                     | appKey for your Evernote app (readonly permissions)                                                          |

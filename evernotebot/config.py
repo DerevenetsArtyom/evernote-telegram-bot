@@ -21,7 +21,7 @@ def make_dirs(config):
 def load_config():
     bot_name = os.getenv('TELEGRAM_BOT_NAME') or 'evernoterobot'
     host = os.getenv('EVERNOTEBOT_HOSTNAME') or '127.0.0.1'
-    port = os.getenv('EVERNOTEBOT_PORT') or 8000
+    port = os.getenv('EVERNOTEBOT_EXPOSE_PORT') or 8000
     bot_api_token = os.getenv('TELEGRAM_API_TOKEN') or 'bot_api_token'
     is_debug = int(os.getenv('EVERNOTEBOT_DEBUG') or 0)
     oauth_url = (host == '127.0.0.1') and f'{host}:{port}/evernote/oauth' or f'{host}/evernote/oauth'
