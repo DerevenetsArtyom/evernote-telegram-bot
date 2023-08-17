@@ -12,7 +12,7 @@ async def set_webhook(request: Request):
     config = request.app.config
     webhook_url = config['webhook_url']
     try:
-        asyncio.run(bot.api.setWebhook(webhook_url))
+        await bot.api.setWebhook(webhook_url)
     except Exception:
         message = f"Can't set up webhook url `{webhook_url}`"
         bot.logger.fatal(message, exc_info=True)
