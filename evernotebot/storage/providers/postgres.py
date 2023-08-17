@@ -17,7 +17,7 @@ class PostgreSQL(BaseProvider):
     def __init__(self, dirpath: str = None, collection: str = None, db_name: str = None) -> None:
         self.database_url = os.getenv("DATABASE_URL", default=f'postgresql://postgres:mysecretpassword@localhost/{db_name}')
 
-        self._connection = psycopg2.connect(database_url)
+        self._connection = psycopg2.connect(self.database_url)
         self.cursor = self._connection.cursor()
         self._table_name = collection
 
@@ -25,13 +25,15 @@ class PostgreSQL(BaseProvider):
         self._connection.commit()
 
     def create(self, data: dict, auto_generate_id: bool = False) -> int:
+        connection = psycopg2.connect(self.database_url)
+        cursor = connection.cursor()
+
         if auto_generate_id:
             if 'id' in data:
                 del data['id']
-            self.cursor.execute(
+            cursor.execute(
                 f'INSERT INTO {self._table_name} (data) VALUES (%s) RETURNING id;', (json.dumps(data), )
             )
-            self._connection.commit()
         else:
             object_id = data['id']
             if object_id <= 0:
@@ -39,9 +41,9 @@ class PostgreSQL(BaseProvider):
             self.cursor.execute(
                 f'INSERT INTO {self._table_name} (id, data) VALUES (%s, %s) RETURNING id;', (object_id, json.dumps(data))
             )
-            self._connection.commit()
+        connection.commit()
 
-        return self.cursor.fetchone()[0]
+        return cursor.fetchone()[0]
 
     def get(self, object_id: int, fail_if_not_exists: bool = False) -> Dict:
         query = object_id if isinstance(object_id, dict) else {'id': object_id}
@@ -52,6 +54,9 @@ class PostgreSQL(BaseProvider):
         return result and result[0]
 
     def get_all(self, query: Optional[Dict] = None) -> typing.Generator:
+        self.connection = psycopg2.connect(self.database_url)
+        self.cursor = self.connection.cursor()
+
         if query is None:
             query = {}
         if 'id' in query:
@@ -85,6 +90,9 @@ class PostgreSQL(BaseProvider):
         return matched
 
     def save(self, data: dict) -> int:
+        self._connection = psycopg2.connect(self.database_url)
+        self.cursor = self._connection.cursor()
+
         object_id = data['id']
         if not object_id:
             object_id = self.create(data, auto_generate_id=True)
@@ -98,6 +106,9 @@ class PostgreSQL(BaseProvider):
         return object_id
 
     def delete(self, object_id: int, check_deleted_count: bool = True) -> None:
+        self._connection = psycopg2.connect(self.database_url)
+        self.cursor = self._connection.cursor()
+
         self.cursor.execute(f'DELETE FROM {self._table_name} WHERE id=%s RETURNING id;', (object_id,))
         self._connection.commit()
 
