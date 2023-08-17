@@ -9,11 +9,7 @@ def root_dir(path: str = '') -> str:
 
 
 def make_dirs(config):
-    dirs = (
-        config['logs_root'],
-        config['tmp_root'],
-        config['storage']['dirpath'],
-    )
+    dirs = (config['tmp_root'], config['storage']['dirpath'])
     for path in dirs:
         os.makedirs(path, exist_ok=True)
 
@@ -36,7 +32,8 @@ def load_config():
         'port': port,
         'oauth_callback_url': os.getenv('OAUTH_CALLBACK_URL') or default_oauth_url,
         'webhook_url': os.getenv('WEBHOOK_URL') or default_webhook_url,
-        'logs_root': root_dir('logs/'),
+        # 'logs_root': root_dir('logs/'),
+        'logs_root': '',
         'tmp_root': os.getenv('TMP_ROOT') or root_dir('tmp/'),
         'telegram': {
             'bot_name': bot_name,
@@ -56,9 +53,9 @@ def load_config():
             },
         },
         'storage': {
-            'provider': 'evernotebot.storage.providers.sqlite.Sqlite',
+            'provider': 'evernotebot.storage.providers.postgres.PostgreSQL',
             'db_name': bot_name,
-            'dirpath': root_dir('db/'),
+            'dirpath': '',
         },
     }
     make_dirs(config)

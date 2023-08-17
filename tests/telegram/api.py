@@ -37,9 +37,9 @@ class Api(AsgiApplication):
         )
         super().__init__(url_schema, bind=f'{host}:{port}')
         storage_config = {
-            'provider': 'evernotebot.storage.providers.sqlite.Sqlite',
+            'provider': 'evernotebot.storage.providers.postgres.PostgreSQL',
             'db_name': 'telegram_api',
-            'dirpath': '/tmp/telegram-api/',
+            'dirpath': '',
         }
         self.users = Storage('users', storage_config)
         self.bots = Storage('bots', storage_config)

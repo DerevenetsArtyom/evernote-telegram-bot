@@ -14,8 +14,8 @@ load_dotenv()
 
 
 class PostgreSQL(BaseProvider):
-    def __init__(self, collection: str = None, db_name: str = None) -> None:
-        database_url = os.getenv("DATABASE_URL", default=f'postgresql://postgres:mysecretpassword@localhost/{db_name}')
+    def __init__(self, dirpath: str = None, collection: str = None, db_name: str = None) -> None:
+        self.database_url = os.getenv("DATABASE_URL", default=f'postgresql://postgres:mysecretpassword@localhost/{db_name}')
 
         self._connection = psycopg2.connect(database_url)
         self.cursor = self._connection.cursor()
