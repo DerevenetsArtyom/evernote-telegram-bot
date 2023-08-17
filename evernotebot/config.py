@@ -11,7 +11,8 @@ def root_dir(path: str = '') -> str:
 def make_dirs(config):
     dirs = (config['tmp_root'], config['storage']['dirpath'])
     for path in dirs:
-        os.makedirs(path, exist_ok=True)
+        if path:
+            os.makedirs(path, exist_ok=True)
 
 
 def load_config():
